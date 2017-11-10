@@ -1,4 +1,6 @@
 models/*
-.ipynb_checkpoints
+.ipynb_checkpoints/
 __pycache__
 *.ipynb
+
+.ipynb_checkpoints/inference-checkpoint.ipynb
