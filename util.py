@@ -3,6 +3,7 @@ from io import StringIO
 import PIL.Image
 from IPython.display import Image, display
 
+# RGBimg to GBRimg
 def showBGRimage(a, fmt='jpeg'):
     a = np.uint8(np.clip(a, 0, 255))
     a[:,:,[0,2]] = a[:,:,[2,0]] # for B,G,R order
@@ -10,20 +11,14 @@ def showBGRimage(a, fmt='jpeg'):
     PIL.Image.fromarray(a).save(f, fmt)
     display(Image(data=f.getvalue()))
 
+
 def showmap(a, fmt='png'):
     a = np.uint8(np.clip(a, 0, 255))
     f = StringIO()
     PIL.Image.fromarray(a).save(f, fmt)
     display(Image(data=f.getvalue()))
 
-#def checkparam(param):
-#    octave = param['octave']
-#    starting_range = param['starting_range']
-#    ending_range = param['ending_range']
-#    assert starting_range <= ending_range, 'starting ratio should <= ending ratio'
-#    assert octave >= 1, 'octave should >= 1'
-#    return starting_range, ending_range, octave
-
+#
 def getJetColor(v, vmin, vmax):
     c = np.zeros((3))
     if (v < vmin):
@@ -47,6 +42,7 @@ def getJetColor(v, vmin, vmax):
         c[2] = 256 * (-4 * v + 4.5) #R: 1 ~ 0.5
     return c
 
+# gray_img to color_img
 def colorize(gray_img):
     out = np.zeros(gray_img.shape + (3,))
     for y in range(out.shape[0]):
@@ -54,6 +50,7 @@ def colorize(gray_img):
             out[y,x,:] = getJetColor(gray_img[y,x], 0, 1)
     return out
 
+# img_padded is padded img and pad is num of padding pixel
 def padRightDownCorner(img, stride, padValue):
     h = img.shape[0]
     w = img.shape[1]
