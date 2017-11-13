@@ -16,7 +16,7 @@ import numpy as np
 import util
 
 
-def relu(x): 
+def relu(x):
     return Activation('relu')(x)
 
 def conv(x, nf, ks, name):
