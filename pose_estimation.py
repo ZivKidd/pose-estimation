@@ -253,12 +253,12 @@ def dict2json(output, name):
     json_dict = json.loads(json_str)
     # json データの書き込み
     with open(name+'.json', 'w') as f:
-        json.dump(json_dict, f)
+        json.dump(json_dict, f, indent=3)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
     parser.add_argument("--target_path",
-            default="/mnt/storage/clients/rakuten/Koboサンプル映像/20170630_P/01.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--weights_path",
@@ -297,14 +297,17 @@ if __name__ == "__main__":
         dict2json(output, name)
 
     elif args.mode == "movie":
+        name = os.path.basename(args.target_path)[:-4]
+        if not os.path.isdir("result/"+name):
+            os.mkdir("result/"+name)
         frame_num = 0
         cap = cv2.VideoCapture(args.target_path)
-        while True:
+
+        while(cap.isOpened()):
             # get frame
             ret, frame = cap.read()
             # cap flag
             if ret == False:
-                print("can't read")
                 break
             origimg = frame
             multiplier = [x * model_params["boxsize"] / origimg.shape[0] for x in param["scale_search"]]
@@ -318,13 +321,15 @@ if __name__ == "__main__":
 
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
-            name = "./result/"+os.path.basename(args.target_path)[:-4]+frame_num
-            dict2json(output, name)
+            output_path = "result/"+name+"/"+str("%05.f"%frame_num)
+            print(output_path)
+            dict2json(output, output_path)
             frame_num += 1
 
             key = cv2.waitKey(1)
             if key == ord("q"):
                 break
+        print("done")
 
     else:
         print("wrong mode")
