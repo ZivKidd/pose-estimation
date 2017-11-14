@@ -11,7 +11,6 @@ import scipy
 import math
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 # model config
 param = {'use_gpu': 1,
