@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from paf import BuildModel
-import util
-
+import os
 import json
 import argparse
 import cv2
@@ -10,7 +8,9 @@ from scipy.ndimage.filters import gaussian_filter
 import scipy
 import math
 
-import os
+from paf import BuildModel
+import util
+
 
 # model config
 param = {'use_gpu': 1,
@@ -45,10 +45,13 @@ mapIdx = [[31,32], [39,40], [33,34], [35,36], [41,42], [43,44], [19,20], [21,22]
           [23,24], [25,26], [27,28], [29,30], [47,48], [49,50], [53,54], [51,52], \
           [55,56], [37,38], [45,46]]
 
+# load image
 def loadimg(img_path):
     origimg = cv2.imread(img_path)
+
     return origimg
 
+# img->input tensor
 def createinput(img, scale):
     # origimgのサイズにscaleをかける
     imageToTest = cv2.resize(img, (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
@@ -74,6 +77,7 @@ def inferene(model, imageToTest_padded, pad):
 
     return paf, heatmap
 
+# compute joints
 def compute_joint(heatmap, paf, origimg):
     # peak with score and id
     # 関節ごとにまとめられたリスト
@@ -156,7 +160,7 @@ def compute_joint(heatmap, paf, origimg):
 
     # last number in each row is the total parts number of that person
     # the second last number in each row is the score of the overall configuration
-    # 一人の人間ごとにidをまとめたもの
+    # personごとにまとめる
     subset = -1 * np.ones((0, 20))
     candidate = np.array([item for sublist in all_peaks for item in sublist])
 
@@ -203,7 +207,6 @@ def compute_joint(heatmap, paf, origimg):
                     row[-2] = sum(candidate[connection_all[k][i,:2].astype(int), 2]) + connection_all[k][i][2]
                     subset = np.vstack([subset, row])
 
-
     # delete some rows of subset which has few parts occur
     deleteIdx = [];
     for i in range(len(subset)):
@@ -213,7 +216,7 @@ def compute_joint(heatmap, paf, origimg):
 
     return subset, candidate
 
-
+# intify picher
 def create_dict(subset, candidate, oriImg):
     disperision = np.array([])
     for n in range(len(subset)):
@@ -225,8 +228,6 @@ def create_dict(subset, candidate, oriImg):
                 Y = candidate[subset[n][i], 1]
                 #X_coords = np.append(coords, X)
                 Y_coords = np.append(Y_coords, Y)
-        #print(len(coords))
-        #print(coords)
         disperision = np.append(disperision,np.var(Y_coords))
 
     person_id = np.argmax(disperision)
@@ -246,13 +247,14 @@ def create_dict(subset, candidate, oriImg):
 
     return output
 
-
+# dict to json
 def dict2json(output, name):
     json_str = json.dumps(output)
     json_dict = json.loads(json_str)
     # json データの書き込み
     with open(name+'.json', 'w') as f:
         json.dump(json_dict, f, indent=3)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
@@ -275,7 +277,6 @@ if __name__ == "__main__":
     model = BuildModel(args.weights_path)
     #print(model.summary())
     print("---Done---")
-
 
     if args.mode == "image":
         # load orignal image
@@ -320,7 +321,7 @@ if __name__ == "__main__":
 
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
-            output_path = "result/"+name+"/"+str("%05.f"%frame_num)
+            output_path = "./result/"+name+"/"+str("%05.f"%frame_num)
             print(output_path)
             dict2json(output, output_path)
             frame_num += 1
@@ -332,7 +333,6 @@ if __name__ == "__main__":
 
     else:
         print("wrong mode")
-
 
     if args.mode == "movie":
         cap.release()
