@@ -7,13 +7,6 @@ from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.layers.merge import Concatenate
-from config_reader import config_reader
-import scipy
-import math
-
-import cv2
-import numpy as np
-import util
 
 
 def relu(x):

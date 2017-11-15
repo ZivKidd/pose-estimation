@@ -271,7 +271,13 @@ if __name__ == "__main__":
             choices=["movie", "image"],
             type=str,
             help="estimation mode")
+    parser.add_argument("--gpu_num",
+            default="0",
+            type=str,
+            help="gpu_num")
     args = parser.parse_args()
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_num
 
     print("-----Loading weight-----")
     model = BuildModel(args.weights_path)
