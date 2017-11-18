@@ -28,6 +28,8 @@ param = {'use_gpu': 1,
      'crop_ratio': 2.5,
      'bbox_ratio': 0.25
     }
+
+# model paraeters
 model_params = {'boxsize': 368,
                 'padValue': 128,
                 'np': '12',
@@ -51,7 +53,7 @@ def loadimg(img_path):
 
     return origimg
 
-# img->input tensor
+# img -> input tensor
 def createinput(img, scale):
     # origimgのサイズにscaleをかける
     imageToTest = cv2.resize(img, (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
