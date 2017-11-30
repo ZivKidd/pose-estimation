@@ -84,7 +84,7 @@ def getGrove(image, output, handedness="right"):
 
     # crop near hand
     if output["points"][hand][0] == None or output["points"][hand][1] == None:
-        return image[:,:,::-1], None, 0
+        return image, None, 0
 
     x = int(output["points"][hand][0])
     y = int(output["points"][hand][1])
@@ -92,7 +92,7 @@ def getGrove(image, output, handedness="right"):
     ymin = y-50
     xmax = x
     ymax = y+70
-    croped = image[ymin:ymax, xmin:xmax, ::-1].copy()
+    croped = image[ymin:ymax, xmin:xmax].copy()
 
     # グレースケール
     gray = cv2.cvtColor(croped, cv2.COLOR_BGR2GRAY)
@@ -133,7 +133,7 @@ def getGrove(image, output, handedness="right"):
 
     # 最大領域のpixel数
     nb_pixel = np.unique(markers,return_counts=True)[1][max_id]
-    croped[markers == max_id] = [255, 0, 0]
+    croped[markers == max_id] = [0, 0, 255]
     image[ymin:ymax, xmin:xmax] = croped
 
-    return image[:,:,::-1], index, nb_pixel
+    return image, index, nb_pixel

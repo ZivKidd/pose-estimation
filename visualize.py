@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib
 import argparse
 import pylab as plt
+import util
+from tqdm import tqdm
 
 model_params = {'boxsize': 368,
                 'padValue': 128,
@@ -37,6 +39,7 @@ def visualize_points(output, canvas, circlesize):
         cv2.circle(canvas, (int(X), int(Y)), circlesize, colors[1], thickness=-1)
     return canvas
 
+
 def visualize_limb(output, canvas, stickwidth):
     stickwidth = 4
     for i in range(17):
@@ -65,11 +68,11 @@ def load_img(img_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="visualize born model")
     parser.add_argument("--target_path",
-            default="/mnt/storage/clients/rakuten/Kobo/20170630_P/01.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--json_dir",
-            default="./result/01",
+            default="./result/02",
             type=str,
             help="json dirctory")
     parser.add_argument("--json_path",
@@ -80,6 +83,11 @@ if __name__ == "__main__":
             choices=["movie", "image"],
             type=str,
             help="estimation mode")
+    parser.add_argument("--handedness",
+            default="right",
+            choices=["right", "left"],
+            type=str,
+            help="picher handness")
     parser.add_argument("--stickwidth",
             default=4,
             type=int,
@@ -124,7 +132,9 @@ if __name__ == "__main__":
 
         cmap = matplotlib.cm.get_cmap("hsv")
 
-        while(cap.isOpened()):
+        nb_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        for frame_num in tqdm(range(nb_frame)):
             # get frame
             ret, frame = cap.read()
             if ret == False:
@@ -135,8 +145,9 @@ if __name__ == "__main__":
             with open(args.json_dir+"/"+json_path, "r") as f:
                 output = json.load(f)
 
-            canvas = frame
-            canvas = visualize_points(output,canvas, args.circlesize)
+            canvas = frame.copy()
+            canvas, index, nb_pixel = util.getGrove(canvas, output, args.handedness)
+            canvas = visualize_points(output, canvas, args.circlesize)
             canvas = visualize_limb(output, canvas, args.stickwidth)
 
             rec.write(canvas)

@@ -262,7 +262,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
     parser.add_argument("--target_path",
             "-t",
-            default="/mnt/storage/clients/rakuten/Kobo/20170630_P/01.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--weights_path",
