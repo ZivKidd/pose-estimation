@@ -251,12 +251,11 @@ def create_dict(subset, candidate, oriImg):
     return output
 
 # dict to json
-def dict2json(output, name):
+def dict2json(output):
     json_str = json.dumps(output)
     json_dict = json.loads(json_str)
-    # json データの書き込み
-    with open(name+'.json', 'w') as f:
-        json.dump(json_dict, f, indent=3)
+
+    return json_dict
 
 
 if __name__ == "__main__":
@@ -269,6 +268,10 @@ if __name__ == "__main__":
             default="./models/model.h5",
             type=str,
             help="weight path")
+    parser.add_argument("--output_dir",
+            default="./result/",
+            type=str,
+            help="output dirctory path")
     parser.add_argument("--mode",
             default="movie",
             choices=["movie", "image"],
@@ -302,13 +305,17 @@ if __name__ == "__main__":
 
         subset, candidate = compute_joint(heatmap, paf, origimg)
         output = create_dict(subset, candidate, origimg)
-        name = "./result/"+os.path.basename(args.target_path)[:-4]
-        dict2json(output, name)
+        output_path = args.output_dir+os.path.basename(args.target_path)[:-4]+".json"
+        json_dict = dict2json(output)
+
+        # json データの書き込み
+        with open(output_path, 'w') as f:
+            json.dump(json_dict, f, indent=3)
 
     elif args.mode == "movie":
         name = os.path.basename(args.target_path)[:-4]
-        if not os.path.isdir("result/"+name):
-            os.mkdir("result/"+name)
+        if not os.path.isdir(args.output_dir+name):
+            os.mkdir(args.output_dir+name)
         cap = cv2.VideoCapture(args.target_path)
         # get number of frame
         nb_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -330,9 +337,12 @@ if __name__ == "__main__":
 
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
-            output_path = "./result/"+name+"/"+str("%05.f"%frame_num)
-            dict2json(output, output_path)
-            frame_num += 1
+            output_path = args.output_dir+name+"/"+str("%05.f"%(frame_num+1))+".json"
+            json_dict = dict2json(output)
+
+            # json データの書き込み
+            with open(output_path, 'w') as f:
+                json.dump(json_dict, f, indent=3)
 
             key = cv2.waitKey(1)
             if key == ord("q"):
