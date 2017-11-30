@@ -7,6 +7,7 @@ import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import scipy
 import math
+from tqdm import tqdm
 
 from paf import BuildModel
 import util
@@ -308,10 +309,11 @@ if __name__ == "__main__":
         name = os.path.basename(args.target_path)[:-4]
         if not os.path.isdir("result/"+name):
             os.mkdir("result/"+name)
-        frame_num = 0
         cap = cv2.VideoCapture(args.target_path)
+        # get number of frame
+        nb_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        while(cap.isOpened()):
+        for frame_num in tqdm(range(nb_frame)):
             # get frame
             ret, frame = cap.read()
             # cap flag
@@ -330,7 +332,6 @@ if __name__ == "__main__":
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
             output_path = "./result/"+name+"/"+str("%05.f"%frame_num)
-            print(output_path)
             dict2json(output, output_path)
             frame_num += 1
 
