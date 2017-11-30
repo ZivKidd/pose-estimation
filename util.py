@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import numpy as np
+import cv2
 from io import StringIO
 import PIL.Image
 from IPython.display import Image, display
@@ -18,7 +20,7 @@ def showmap(a, fmt='png'):
     PIL.Image.fromarray(a).save(f, fmt)
     display(Image(data=f.getvalue()))
 
-#
+
 def getJetColor(v, vmin, vmax):
     c = np.zeros((3))
     if (v < vmin):
@@ -72,3 +74,66 @@ def padRightDownCorner(img, stride, padValue):
     img_padded = np.concatenate((img_padded, pad_right), axis=1)
 
     return img_padded, pad
+
+def getGrove(image, output, handedness="right"):
+    # handedness
+    if handedness == "right":
+        hand = "Lwri"
+    else:
+        hand = "Rwri"
+
+    # crop near hand
+    if output["points"][hand][0] == None or output["points"][hand][1] == None:
+        return image[:,:,::-1], None, 0
+
+    x = int(output["points"][hand][0])
+    y = int(output["points"][hand][1])
+    xmin = x-100
+    ymin = y-50
+    xmax = x
+    ymax = y+70
+    croped = image[ymin:ymax, xmin:xmax, ::-1].copy()
+
+    # グレースケール
+    gray = cv2.cvtColor(croped, cv2.COLOR_BGR2GRAY)
+
+    # otsuの2値化
+    thresh,bin_img = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    # モルフォロジーによる ノイズ消去
+    kernel = np.ones((3,3),np.uint8)
+    opening = cv2.morphologyEx(bin_img,cv2.MORPH_OPEN,kernel,iterations = 2)
+    sure_bg = cv2.dilate(opening,kernel,iterations=1)
+
+    #  オブジェクトと背景の距離変換から全景の取得
+    dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+    ret, sure_fg = cv2.threshold(dist_transform,0.5*dist_transform.max(),255,0)
+
+    # 背景でも前景でもない部分の取得
+    sure_fg = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg,sure_fg)
+
+    # 領域のラベリング
+    ret, markers = cv2.connectedComponents(sure_fg)
+    # 背景:0 -> 1 , オブジェクト:1~ -> 2~
+    markers = markers+1
+    # unknown:0 , 背景:1,  オブジェクト:2~
+    markers[unknown==255] = 0
+
+    # watarshed
+    markers = cv2.watershed(croped,markers)
+
+    # max_id:  最大の領域のオブジェクト, nb_pixel: 最大領域のピクセル数
+    max_id = np.unique(markers,return_counts=True)[1][2:].argmax()+2
+
+    # 元の画像でのグローブのインデックス
+    index = np.where(markers == max_id)
+    index[0][:] += xmin
+    index[1][:] += ymin
+
+    # 最大領域のpixel数
+    nb_pixel = np.unique(markers,return_counts=True)[1][max_id]
+    croped[markers == max_id] = [255, 0, 0]
+    image[ymin:ymax, xmin:xmax] = croped
+
+    return image[:,:,::-1], index, nb_pixel

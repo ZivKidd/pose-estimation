@@ -261,23 +261,33 @@ def dict2json(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
     parser.add_argument("--target_path",
+            "-t",
             default="/mnt/storage/clients/rakuten/Kobo/20170630_P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--weights_path",
+            "-w",
             default="./models/model.h5",
             type=str,
             help="weight path")
     parser.add_argument("--output_dir",
+            "-o",
             default="./result/",
             type=str,
             help="output dirctory path")
     parser.add_argument("--mode",
+            "-m",
             default="movie",
             choices=["movie", "image"],
             type=str,
             help="estimation mode")
+    parser.add_argument("--handedness",
+            default="right",
+            choices=["right", "left"],
+            type=str,
+            help="picher handedness")
     parser.add_argument("--gpu_num",
+            "-g",
             default="0",
             type=str,
             help="gpu_num")
@@ -337,6 +347,10 @@ if __name__ == "__main__":
 
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
+
+            # get grove
+            _, index, nb_pixel = util.getGrove(origimg, output, args.handedness)
+
             output_path = args.output_dir+name+"/"+str("%05.f"%(frame_num+1))+".json"
             json_dict = dict2json(output)
 
