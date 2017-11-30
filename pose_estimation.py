@@ -315,11 +315,10 @@ if __name__ == "__main__":
 
         for frame_num in tqdm(range(nb_frame)):
             # get frame
-            ret, frame = cap.read()
+            ret, origimg = cap.read()
             # cap flag
             if ret == False:
                 break
-            origimg = frame
             multiplier = [x * model_params["boxsize"] / origimg.shape[0] for x in param["scale_search"]]
             scale = multiplier[0]
             # create inputs with padding
