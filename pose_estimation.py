@@ -349,7 +349,7 @@ if __name__ == "__main__":
             output = create_dict(subset, candidate, origimg)
 
             # get grove
-            _, index, nb_pixel = util.getGrove(origimg, output, args.handedness)
+            _, output = util.getGrove(origimg, output, args.handedness)
 
             output_path = args.output_dir+name+"/"+str("%05.f"%(frame_num+1))+".json"
             json_dict = dict2json(output)

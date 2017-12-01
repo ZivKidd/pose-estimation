@@ -3,22 +3,7 @@ import numpy as np
 import cv2
 from io import StringIO
 import PIL.Image
-from IPython.display import Image, display
-
-# RGBimg to GBRimg
-def showBGRimage(a, fmt='jpeg'):
-    a = np.uint8(np.clip(a, 0, 255))
-    a[:,:,[0,2]] = a[:,:,[2,0]] # for B,G,R order
-    f = StringIO()
-    PIL.Image.fromarray(a).save(f, fmt)
-    display(Image(data=f.getvalue()))
-
-
-def showmap(a, fmt='png'):
-    a = np.uint8(np.clip(a, 0, 255))
-    f = StringIO()
-    PIL.Image.fromarray(a).save(f, fmt)
-    display(Image(data=f.getvalue()))
+import math
 
 
 def getJetColor(v, vmin, vmax):
@@ -75,6 +60,28 @@ def padRightDownCorner(img, stride, padValue):
 
     return img_padded, pad
 
+def computeGrove(index, nb_pixel, output):
+    if output["points"]["Rhip"] == None or output["points"]["Lhip"] == None:
+        output["grove"] = {"pos":None, "area":None}
+        return output
+    elif len(index[0]) == 0 or len(index[1]) == 0:
+        output["grove"] = {"pos":None, "area":None}
+        return output
+    elif nb_pixel is None:
+        output["grove"] = {"pos":None, "area":None}
+        return output
+    else:
+        # compute grove relative coords
+        pose_center = [int((p1+p2)/2) for (p1, p2) in zip(output["points"]["Rhip"], output["points"]["Lhip"])]
+        grove_center = [int((index[0].min()+index[0].max())/2), int((index[1].min()+index[1].max())/2)]
+        pos = (round(grove_center[0]/pose_center[0], 3), round(grove_center[1]/pose_center[1], 3))
+        # compute grove relative area
+        radius = np.linalg.norm([abs(p1-p2) for (p1, p2) in zip(output["points"]["Rhip"], output["points"]["Lhip"])])/2
+        area = round(nb_pixel/int(radius**2*math.pi), 3)
+
+        output["grove"] = {"pos":pos, "area":area}
+        return output
+
 def getGrove(image, output, handedness="right"):
     # handedness
     if handedness == "right":
@@ -84,7 +91,8 @@ def getGrove(image, output, handedness="right"):
 
     # crop near hand
     if output["points"][hand][0] == None or output["points"][hand][1] == None:
-        return image, None, 0
+        output["grove"] = {"pos":None, "area":None}
+        return image, output
 
     x = int(output["points"][hand][0])
     y = int(output["points"][hand][1])
@@ -136,4 +144,7 @@ def getGrove(image, output, handedness="right"):
     croped[markers == max_id] = [0, 0, 255]
     image[ymin:ymax, xmin:xmax] = croped
 
-    return image, index, nb_pixel
+    # 腰の基準としたグローブの面積と位置
+    output = computeGrove(index, nb_pixel, output)
+
+    return image, output

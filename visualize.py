@@ -146,7 +146,7 @@ if __name__ == "__main__":
                 output = json.load(f)
 
             canvas = frame.copy()
-            canvas, index, nb_pixel = util.getGrove(canvas, output, args.handedness)
+            canvas, output = util.getGrove(canvas, output, args.handedness)
             canvas = visualize_points(output, canvas, args.circlesize)
             canvas = visualize_limb(output, canvas, args.stickwidth)
 
@@ -157,56 +157,6 @@ if __name__ == "__main__":
                 break
 
             frame_num += 1
-
-        cv2.destroyAllWindows()
-        rec.release()
-
-    elif mode == "black":
-        # json list
-        json_list = os.listdir(args.json_dir)
-        json_list.sort()
-        json_name = json_list[0]
-
-        # get json
-        json_path = json_list[frame_num]
-        with open(args.json_dir+"/"+json_path, "r") as f:
-            output = json.load(f)
-
-        # base name
-        base = os.path.basename(args.json_dir)
-        if os.path.isdir("result/movie/"+base):
-            os.mkdir("result/movie/"+base)
-
-        # output path
-        output_path = "result/movie/"+base+".mp4"
-
-        # load movie
-        cap = cv2.VideoCapture(args.target_path)
-
-        # save movie
-        rec = cv2.VideoWriter(output_path,
-                cv2.VideoWriter_fourcc(*'XVID'),
-                30,
-                (output["img_shape"][0], output["img_shape"][1]),
-                True)
-
-        cmap = matplotlib.cm.get_cmap("hsv")
-
-        for i in range(len(json_list)):
-            # get json
-            json_path = json_list[i]
-            with open(args.json_dir+"/"+json_path, "r") as f:
-                output = json.load(f)
-
-            canvas = np.zeros((output["img_shape"][0], output["img_shape"][1], 3))
-            canvas = visualize_points(output,canvas, args.circlesize)
-            canvas = visualize_limb(output, canvas, args.stickwidth)
-
-            rec.write(canvas)
-
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord("q"):
-                break
 
         cv2.destroyAllWindows()
         rec.release()
