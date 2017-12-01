@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib
 import argparse
 import pylab as plt
-import util
+import utils
 from tqdm import tqdm
 
 model_params = {'boxsize': 368,
@@ -99,9 +99,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.mode == "movie":
-        # frame number
         frame_num = 0
-
         # json list
         json_list = os.listdir(args.json_dir)
         json_list.sort()
@@ -146,7 +144,7 @@ if __name__ == "__main__":
                 output = json.load(f)
 
             canvas = frame.copy()
-            canvas, output = util.getGrove(canvas, output, args.handedness)
+            canvas, output = utils.getGrove(canvas, output, args.handedness)
             canvas = visualize_points(output, canvas, args.circlesize)
             canvas = visualize_limb(output, canvas, args.stickwidth)
 

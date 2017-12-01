@@ -10,7 +10,8 @@ import math
 from tqdm import tqdm
 
 from paf import BuildModel
-import util
+import utils
+import computeAngle
 
 
 # model config
@@ -59,7 +60,7 @@ def createinput(img, scale):
     # origimgのサイズにscaleをかける
     imageToTest = cv2.resize(img, (0,0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
     # 下と右をpadding padはどれだけpaddingしたか imageTo
-    imageToTest_padded, pad = util.padRightDownCorner(imageToTest, model_params['stride'], model_params['padValue'])
+    imageToTest_padded, pad = utils.padRightDownCorner(imageToTest, model_params['stride'], model_params['padValue'])
 
     return imageToTest_padded, pad
 
@@ -349,7 +350,10 @@ if __name__ == "__main__":
             output = create_dict(subset, candidate, origimg)
 
             # get grove
-            _, output = util.getGrove(origimg, output, args.handedness)
+            _, output = utils.getGrove(origimg, output, args.handedness)
+            # get anfle
+            angler = computeAngle.computeAngle(output, args.handedness)
+            output = angler.compute()
 
             output_path = args.output_dir+name+"/"+str("%05.f"%(frame_num+1))+".json"
             json_dict = dict2json(output)
