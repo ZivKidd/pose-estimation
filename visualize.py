@@ -68,7 +68,7 @@ def load_img(img_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="visualize born model")
     parser.add_argument("--target_path",
-            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/01.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/02.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--json_dir",

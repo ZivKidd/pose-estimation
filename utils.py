@@ -98,7 +98,7 @@ def getGrove(image, output, handedness="right"):
     y = int(output["points"][hand][1])
     xmin = x-100
     ymin = y-50
-    xmax = x
+    xmax = x+50
     ymax = y+70
     croped = image[ymin:ymax, xmin:xmax].copy()
 
