@@ -114,7 +114,7 @@ class computeAngle:
         upperRight, upperLeft = upperAngle(self)
         lowerRight, lowerLeft = lowerAngle(self)
 
-        self.output["angel"] = {
+        self.output["angle"] = {
                             "shoulder":shoulder,
                             "wrist": wrist,
                             "arm": arm,
