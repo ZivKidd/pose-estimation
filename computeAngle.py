@@ -2,13 +2,12 @@
 import numpy as np
 import math
 
-class threeAngle:
-    def __init__ (self, output, hand, joint_list):
+class computeJoint:
+    def __init__ (self, output, joint_list):
         self.output = output
-        self.hand = hand
-        self.joint_list
+        self.joint_list = joint_list
 
-    def angle(x, y):
+    def VectorAngle(self, x, y):
         dot_xy = np.dot(x, y)
         norm_x = np.linalg.norm(x)
         norm_y = np.linalg.norm(y)
@@ -17,19 +16,23 @@ class threeAngle:
         theta = rad * 180 / np.pi
         return theta
 
-    def vector(joint1, joint2, joint3):
-        x = [p1-p2 for (p1, p2) in zip(output["joints"][joint2], output["joints"][joint1])]
-        y = [p1-p2 for (p1, p2) in zip(output["joints"][joint3], output["joints"][joint1])]
-        theta = angle(x, y)
-        return theta
+    def vector(self, joint1, joint2, joint3):
+        x = [p1-p2 for (p1, p2) in zip(self.output["joints"][joint2], self.output["joints"][joint1])]
+        y = [p1-p2 for (p1, p2) in zip(self.output["joints"][joint3], self.output["joints"][joint1])]
+        return self.VectorAngle(x, y)
 
-
-    def compute(self):
-        output = self.output
-        angle1 = vector(self.joint_list[0], self.joint_list[1], self.joint_list[2])
-        angle2 = vector(self.joint_list[1], self.joint_list[2], self.joint_list[0])
-        angle3 = vector(self.joint_list[2], self.joint_list[0], self.joint_list[1])
+    def angle(self):
+        angle1 = self.vector(self.joint_list[0], self.joint_list[1], self.joint_list[2])
+        angle2 = self.vector(self.joint_list[1], self.joint_list[2], self.joint_list[0])
+        angle3 = self.vector(self.joint_list[2], self.joint_list[0], self.joint_list[1])
         return [angle1, angle2, angle3]
+
+    def distance(self):
+        x1 = self.output["joints"][self.joint_list[0]][0]
+        y1 = self.output["joints"][self.joint_list[0]][1]
+        x2 = self.output["joints"][self.joint_list[1]][0]
+        y2 = self.output["joints"][self.joint_list[1]][1]
+        return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
 
 class computeAngle:
