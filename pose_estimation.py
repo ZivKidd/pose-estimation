@@ -237,17 +237,17 @@ def create_dict(subset, candidate, oriImg):
     person_id = np.argmax(disperision)
 
     output = {"img_shape":(oriImg.shape[1], oriImg.shape[0]),
-          "points":{}}
+          "joints":{}}
 
     for i in range(18):
         if subset[person_id][i] >= 0:
             X = candidate[subset[person_id][i], 0]
             Y = candidate[subset[person_id][i], 1]
-            output["points"][model_params["part_str"][i]] = (X, Y)
+            output["joints"][model_params["part_str"][i]] = (X, Y)
         else:
             X = None
             Y = None
-            output["points"][model_params["part_str"][i]] = (X, Y)
+            output["joints"][model_params["part_str"][i]] = (X, Y)
 
     return output
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
     parser.add_argument("--target_path",
             "-t",
-            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/02.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--weights_path",
@@ -351,7 +351,8 @@ if __name__ == "__main__":
 
             # get grove
             _, output = utils.getGrove(origimg, output, args.handedness)
-            # get anfle
+
+            # get angle
             angler = computeAngle.computeAngle(output, args.handedness)
             output = angler.compute()
 

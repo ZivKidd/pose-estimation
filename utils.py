@@ -61,7 +61,7 @@ def padRightDownCorner(img, stride, padValue):
     return img_padded, pad
 
 def computeGrove(index, nb_pixel, output):
-    if output["points"]["Rhip"] == None or output["points"]["Lhip"] == None:
+    if output["joints"]["Rhip"] == None or output["joints"]["Lhip"] == None:
         output["grove"] = {"pos":None, "area":None}
         return output
     elif len(index[0]) == 0 or len(index[1]) == 0:
@@ -72,11 +72,11 @@ def computeGrove(index, nb_pixel, output):
         return output
     else:
         # compute grove relative coords
-        pose_center = [int((p1+p2)/2) for (p1, p2) in zip(output["points"]["Rhip"], output["points"]["Lhip"])]
+        pose_center = [int((p1+p2)/2) for (p1, p2) in zip(output["joints"]["Rhip"], output["joints"]["Lhip"])]
         grove_center = [int((index[0].min()+index[0].max())/2), int((index[1].min()+index[1].max())/2)]
         pos = (round(grove_center[0]/pose_center[0], 3), round(grove_center[1]/pose_center[1], 3))
         # compute grove relative area
-        radius = np.linalg.norm([abs(p1-p2) for (p1, p2) in zip(output["points"]["Rhip"], output["points"]["Lhip"])])/2
+        radius = np.linalg.norm([abs(p1-p2) for (p1, p2) in zip(output["joints"]["Rhip"], output["joints"]["Lhip"])])/2
         area = round(nb_pixel/int(radius**2*math.pi), 3)
 
         output["grove"] = {"pos":pos, "area":area}
@@ -90,12 +90,12 @@ def getGrove(image, output, handedness="right"):
         hand = "Rwri"
 
     # crop near hand
-    if output["points"][hand][0] == None or output["points"][hand][1] == None:
+    if output["joints"][hand][0] == None or output["joints"][hand][1] == None:
         output["grove"] = {"pos":None, "area":None}
         return image, output
 
-    x = int(output["points"][hand][0])
-    y = int(output["points"][hand][1])
+    x = int(output["joints"][hand][0])
+    y = int(output["joints"][hand][1])
     xmin = x-100
     ymin = y-50
     xmax = x+50
