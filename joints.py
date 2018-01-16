@@ -39,7 +39,7 @@ def angle(json_dir, joint_list):
     with open(output_path, "w") as f:
         json.dump(result, f, indent=3)
 
-# get angle function
+# get distance function
 def distance(json_dir, joint_list):
     # consts
     result = {"joints":joint_list}
