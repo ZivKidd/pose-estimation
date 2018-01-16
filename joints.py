@@ -42,7 +42,7 @@ def angle(json_dir, joint_list):
 # get distance function
 def distance(json_dir, joint_list):
     # consts
-    result = {"joints":joint_list}
+    result = {"joints":joint_list[0:2]}
     frame_num = 0
 
     # get json list
