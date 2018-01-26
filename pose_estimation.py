@@ -220,7 +220,7 @@ def compute_joint(heatmap, paf, origimg):
 
     return subset, candidate
 
-# intify picher
+# identify picher
 def create_dict(subset, candidate, oriImg):
     disperision = np.array([])
     for n in range(len(subset)):
@@ -356,7 +356,7 @@ if __name__ == "__main__":
             angler = computeAngle.computeAngle(output, args.handedness)
             output = angler.compute()
 
-            output_path = args.output_dir+name+"/"+str("%05.f"%(frame_num+1))+".json"
+            output_path = args.output_dir+name+"/"+str("%06.f"%(frame_num+1))+".json"
             json_dict = dict2json(output)
 
             # json データの書き込み
