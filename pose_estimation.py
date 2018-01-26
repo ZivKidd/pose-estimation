@@ -324,9 +324,11 @@ if __name__ == "__main__":
             json.dump(json_dict, f, indent=3)
 
     elif args.mode == "movie":
+        # make result dir
         name = os.path.basename(args.target_path)[:-4]
         if not os.path.isdir(args.output_dir+name):
             os.mkdir(args.output_dir+name)
+        # load movie
         cap = cv2.VideoCapture(args.target_path)
         # get number of frame
         nb_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -349,13 +351,14 @@ if __name__ == "__main__":
             subset, candidate = compute_joint(heatmap, paf, origimg)
             output = create_dict(subset, candidate, origimg)
 
-            # get grove
+            # get grove area and position
             _, output = utils.getGrove(origimg, output, args.handedness)
 
-            # get angle
+            # get default angle
             angler = computeAngle.computeAngle(output, args.handedness)
             output = angler.compute()
 
+            # dict to json
             output_path = args.output_dir+name+"/"+str("%06.f"%(frame_num+1))+".json"
             json_dict = dict2json(output)
 
@@ -366,11 +369,8 @@ if __name__ == "__main__":
             key = cv2.waitKey(1)
             if key == ord("q"):
                 break
-        print("done")
 
-    else:
-        print("wrong mode")
-
-    if args.mode == "movie":
+        # end
         cap.release()
         cv2.destroyAllWindows()
+        print("done")
