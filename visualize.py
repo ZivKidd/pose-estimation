@@ -32,8 +32,8 @@ def visualize_points(output, canvas, circlesize):
     for i in range(18):
         rgba = np.array(cmap(1 - i/18. - 1./36))
         rgba[0:3] *= 255
-        X = output["points"][model_params["part_str"][i]][0]
-        Y = output["points"][model_params["part_str"][i]][1]
+        X = output["joints"][model_params["part_str"][i]][0]
+        Y = output["joints"][model_params["part_str"][i]][1]
         if None in [X, Y]:
             continue
         cv2.circle(canvas, (int(X), int(Y)), circlesize, colors[1], thickness=-1)
@@ -43,7 +43,7 @@ def visualize_points(output, canvas, circlesize):
 def visualize_limb(output, canvas, stickwidth):
     stickwidth = 4
     for i in range(17):
-        index = [output['points'][model_params["part_str"][limbSeq[i][0]-1]], output['points'][model_params["part_str"][limbSeq[i][1]-1]]]
+        index = [output['joints'][model_params["part_str"][limbSeq[i][0]-1]], output['joints'][model_params["part_str"][limbSeq[i][1]-1]]]
         if None in index:
             continue
         cur_canvas = canvas.copy()
@@ -68,11 +68,11 @@ def load_img(img_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="visualize born model")
     parser.add_argument("--target_path",
-            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/02.mp4",
+            default="/mnt/storage/clients/rakuten/Kobo/20170630_3P/01.mp4",
             type=str,
             help="target file path")
     parser.add_argument("--json_dir",
-            default="./result/02",
+            default="./result/01",
             type=str,
             help="json dirctory")
     parser.add_argument("--json_path",
