@@ -76,11 +76,14 @@ def computeGrove(index, nb_pixel, output):
         grove_center = [int((index[0].min()+index[0].max())/2), int((index[1].min()+index[1].max())/2)]
         #pos = (round(grove_center[0]/pose_center[0], 3), round(grove_center[1]/pose_center[1], 3))
         pos = (grove_center[0], grove_center[1])
+
         # compute grove relative area
-        radius = np.linalg.norm([abs(p1-p2) for (p1, p2) in zip(output["joints"]["Rhip"], output["joints"]["Lhip"])])/2
-        area = round(nb_pixel/int(radius**2*math.pi), 3)
+        # radius = np.linalg.norm([abs(p1-p2) for (p1, p2) in zip(output["joints"]["Rhip"], output["joints"]["Lhip"])])/2
+        # area = round(nb_pixel/int(radius**2*math.pi), 3)
+        area = int(nb_pixel)
 
         output["grove"] = {"pos":pos, "area":area}
+
         return output
 
 def getGrove(image, output, handedness="right"):

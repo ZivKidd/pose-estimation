@@ -355,8 +355,8 @@ if __name__ == "__main__":
             _, output = utils.getGrove(origimg, output, args.handedness)
 
             # get default angle
-            angler = computeAngle.computeAngle(output, args.handedness)
-            output = angler.compute()
+            # angler = computeAngle.computeAngle(output, args.handedness)
+            # output = angler.compute()
 
             # dict to json
             output_path = args.output_dir+name+"/"+str("%06.f"%(frame_num+1))+".json"
