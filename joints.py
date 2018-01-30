@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 from tqdm import tqdm
-from computeAngle import computeJoint
+from compute import ComputeJoint
 
 
 # get angle function
@@ -31,7 +31,7 @@ def angle(json_dir, joint_list):
         with open(json_dir + "/" + json_path, "r") as f:
             output = json.load(f)
 
-        computer = computeJoint(output, joint_list)
+        computer = ComputeJoint(output, joint_list)
         angles = computer.angle()
         result[str(frame_num)] = angles
     # save json
@@ -64,7 +64,7 @@ def distance(json_dir, joint_list):
         with open(json_dir + "/" + json_path, "r") as f:
             output = json.load(f)
 
-        computer = computeJoint(output, joint_list)
+        computer = ComputeJoint(output, joint_list)
         dist = computer.distance()
         result[str(frame_num)] = dist
     # save json
@@ -72,8 +72,21 @@ def distance(json_dir, joint_list):
         json.dump(result, f, indent=3)
 
 
+def main(mode, json_dir, joint_list):
+    if mode == "angle":
+        angle(json_dir, joint_list)
+    elif mode == "distance":
+        distance(json_dir, joint_list)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pose estimation model")
+    parser.add_argument(
+            "--mode",
+            "-m",
+            default="angle",
+            type=str,
+            help="type")
     parser.add_argument(
             "--json_dir",
             "-j",
@@ -86,15 +99,6 @@ if __name__ == "__main__":
             default=["Rsho", "Rhip", "nose"],
             type=list,
             help="target joint list")
-    parser.add_argument(
-            "--mode",
-            "-m",
-            default="angle",
-            type=str,
-            help="type")
     args = parser.parse_args()
 
-    if args.mode == "angle":
-        angle(args.json_dir, args.joint_list)
-    elif args.mode == "distance":
-        distance(args.json_dir, args.joint_list)
+    main(args.mode, args.json_dir, args.joint_list)

@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from paf import BuildModel
 import utils
-# import computeAngle
+from compute import DefaultAngle
 
 
 # model config
@@ -388,7 +388,7 @@ if __name__ == "__main__":
             _, output = utils.getGrove(origimg, output, args.handedness)
 
             # get default angle
-            # angler = computeAngle.computeAngle(output, args.handedness)
+            # angler = compute.DefaultAngle(output, args.handedness)
             # output = angler.compute()
 
             # dict to json
