@@ -98,6 +98,9 @@ def getGrove(image, output, handedness="right"):
         output["grove"] = {"pos":None, "area":None}
         return image, output
 
+    if not image.shape[2] != 3:
+        return image, ouput
+
     x = int(output["joints"][hand][0])
     y = int(output["joints"][hand][1])
     xmin = x-100

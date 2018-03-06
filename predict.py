@@ -25,6 +25,7 @@ def predict_and_save(model, cap, play_number, save_dir="20171008E-H-1P", seconds
     for frame_num in tqdm(range(30 * seconds)):
         # get frame
         flag, frame = cap.read()
+        print(frame.shape)
         if frame is None:
             print("frame is None")
         # cap flag
@@ -46,10 +47,10 @@ def predict_and_save(model, cap, play_number, save_dir="20171008E-H-1P", seconds
         _, output = utils.getGrove(frame, output, handedness="right")
 
         # dict to json
-        output_dir = base_dir + "/" + str("%06.f"%(play_number))
+        output_dir = base_dir + "/" + str("%06.f"%(play_number + 1))
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
-        output_path =  output_dir + "/" + str("%06.f"%(frame_num+1)) + ".json"
+        output_path =  output_dir + "/" + str("%06.f"%(frame_num + 1)) + ".json"
         json_dict = dict2json(output)
 
         # save json
@@ -94,7 +95,7 @@ if __name__ == "__main__":
 
     # gpuの指定 cpuを使う場合: ""
     gpu_num = ""
-    if use_gpu:
+    if gpu_num:
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu_num
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu_num
