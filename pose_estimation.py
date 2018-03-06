@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 from paf import BuildModel
 import utils
-from compute import DefaultAngle
 
 
 # model config
@@ -246,6 +245,10 @@ def compute_joint(heatmap, paf, origimg):
 
 # identify picher
 def create_dict(subset, candidate, oriImg):
+    output = {
+            "img_shape": (oriImg.shape[1], oriImg.shape[0]),
+            "joints": {"Lwri": [None, None], "Rwri": [None, None]}}
+
     disperision = np.array([])
     for n in range(len(subset)):
         # X_coords = np.array([])
@@ -258,12 +261,10 @@ def create_dict(subset, candidate, oriImg):
                 Y_coords = np.append(Y_coords, Y)
         disperision = np.append(disperision, np.var(Y_coords))
 
-    person_id = np.argmax(disperision)
-
-    output = {
-            "img_shape": (oriImg.shape[1], oriImg.shape[0]),
-            "joints": {}
-            }
+    if not disperision:
+        return output
+    else:
+        person_id = np.argmax(disperision)
 
     for i in range(18):
         if subset[person_id][i] >= 0:
